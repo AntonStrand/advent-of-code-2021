@@ -48,6 +48,28 @@ fn get_columns<'a>(input: &Vec<Vec<&'a str>>) -> Vec<Vec<&'a str>> {
     columns
 }
 
+fn get_rating<'a, F: Fn(&Vec<&str>) -> &'a str>(f: F, input: &Vec<Vec<&str>>) -> u32 {
+    let mut binaries = input.clone();
+    let mut i = 0;
+    let mut j = 0;
+
+    while binaries.len() > 1 {
+        let x = f(get_columns(&binaries).get(i).unwrap());
+
+        binaries = binaries
+            .to_owned()
+            .iter()
+            .filter(|&binary| *binary.get(j).unwrap() == x)
+            .map(|b| b.to_owned())
+            .collect();
+
+        i = i + 1;
+        j = j + 1;
+    }
+
+    to_decimal(binaries.get(0).unwrap().join(""))
+}
+
 fn part01(input: &Vec<String>) -> u32 {
     let (gamma_rate, epsilon_rate) = get_columns(&split_binaries(input)).iter().fold(
         (String::from(""), String::from("")),
@@ -60,27 +82,6 @@ fn part01(input: &Vec<String>) -> u32 {
     );
 
     to_decimal(gamma_rate) * to_decimal(epsilon_rate)
-}
-
-fn get_rating<'a, F: Fn(&Vec<&str>) -> &'a str>(f: F, input: &Vec<Vec<&str>>) -> u32 {
-    let mut binaries = input.clone();
-    let mut i = 0;
-    let mut j = 0;
-    while binaries.len() > 1 {
-        let x = f(get_columns(&binaries).get(i).unwrap());
-
-        binaries = binaries
-            .to_owned()
-            .iter()
-            .filter(|binary| binary.get(j).unwrap() == &x)
-            .map(|b| b.to_owned())
-            .collect();
-
-        i = i + 1;
-        j = j + 1;
-    }
-
-    to_decimal(binaries.get(0).unwrap().join(""))
 }
 
 fn part02(input: &Vec<String>) -> u32 {
