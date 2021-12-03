@@ -4,6 +4,10 @@ fn read(path: &str) -> String {
     std::fs::read_to_string(&path).unwrap()
 }
 
+pub fn read_lines(path: &str) -> Vec<String> {
+    read(path).lines().map(String::from).collect()
+}
+
 pub fn read_number_input(path: &str) -> Vec<u32> {
     read(path)
         .lines()
