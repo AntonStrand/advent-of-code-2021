@@ -1,4 +1,4 @@
-use crate::{read, Solution};
+use crate::{read, to_columns, Solution};
 
 #[derive(Debug)]
 struct Board {
@@ -7,20 +7,6 @@ struct Board {
 }
 
 impl Board {
-    fn get_columns(input: &Vec<Vec<u8>>) -> Vec<Vec<u8>> {
-        let mut columns = vec![];
-
-        for x in 0..5 {
-            let mut column = vec![];
-            for y in 0..input.len() {
-                column.push(input[y][x]);
-            }
-            columns.push(column);
-        }
-
-        columns
-    }
-
     fn new(input: &str) -> Board {
         let rows = input
             .lines()
@@ -37,7 +23,7 @@ impl Board {
             })
             .collect::<Vec<Vec<u8>>>();
 
-        let cols = Board::get_columns(&rows);
+        let cols = to_columns(&rows);
 
         let all = rows.iter().flatten().map(|x| *x).collect();
 
@@ -70,9 +56,9 @@ impl Board {
 
 fn read_input() -> (Vec<Board>, Vec<u8>) {
     let input = read("./input/day_04.txt");
-    let (nums, boards) = input.split_once("\n\n").unwrap();
+    let (numbers, boards) = input.split_once("\n\n").unwrap();
 
-    let numbers: Vec<u8> = nums.split(",").map(|n| n.parse().unwrap()).collect();
+    let numbers: Vec<u8> = numbers.split(",").map(|n| n.parse().unwrap()).collect();
     let boards: Vec<Board> = boards.split("\n\n").map(Board::new).collect();
 
     (boards, numbers)
@@ -94,7 +80,7 @@ fn play(board: &Board, numbers: Vec<u8>) -> Option<(usize, u32, u8)> {
 
     loop {
         match board.get_winning_score(&drawn_numbers) {
-            Some(row) => break Some((i, row, drawn_numbers.pop().unwrap())),
+            Some(score) => break Some((i, score, drawn_numbers.pop().unwrap())),
             None => {
                 if i == numbers.len() {
                     break None;

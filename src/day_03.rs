@@ -1,4 +1,4 @@
-use crate::{read_lines, Solution};
+use crate::{read_lines, to_columns, Solution};
 
 fn one_is_most_common(input: &Vec<&str>) -> bool {
     let (ones, zeros): (Vec<&str>, Vec<&str>) = input.iter().partition(|x| **x == "1");
@@ -32,29 +32,13 @@ fn split_binaries<'a>(input: &'a Vec<String>) -> Vec<Vec<&'a str>> {
         .collect::<Vec<Vec<&str>>>()
 }
 
-fn get_columns<'a>(input: &Vec<Vec<&'a str>>) -> Vec<Vec<&'a str>> {
-    let binary_len = input.get(0).unwrap().len();
-
-    let mut columns = vec![];
-
-    for x in 0..binary_len {
-        let mut column = vec![];
-        for y in 0..input.len() {
-            column.push(input[y][x]);
-        }
-        columns.push(column);
-    }
-
-    columns
-}
-
 fn get_rating<'a, F: Fn(&Vec<&str>) -> &'a str>(f: F, input: &Vec<Vec<&str>>) -> u32 {
     let mut binaries = input.clone();
     let mut i = 0;
     let mut j = 0;
 
     while binaries.len() > 1 {
-        let x = f(get_columns(&binaries).get(i).unwrap());
+        let x = f(to_columns(&binaries).get(i).unwrap());
 
         binaries = binaries
             .to_owned()
@@ -71,7 +55,7 @@ fn get_rating<'a, F: Fn(&Vec<&str>) -> &'a str>(f: F, input: &Vec<Vec<&str>>) ->
 }
 
 fn part01(input: &Vec<String>) -> u32 {
-    let (gamma_rate, epsilon_rate) = get_columns(&split_binaries(input)).iter().fold(
+    let (gamma_rate, epsilon_rate) = to_columns(&split_binaries(input)).iter().fold(
         (String::from(""), String::from("")),
         |(gamma_rate, epsilon_rate), column| {
             (
@@ -111,7 +95,7 @@ mod tests {
             vec!["1", "0", "1", "1", "0"],
         ];
         assert_eq!(
-            get_columns(&input),
+            to_columns(&input),
             vec![
                 vec!["0", "1", "1"],
                 vec!["0", "1", "0"],
