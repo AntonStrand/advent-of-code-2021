@@ -1,6 +1,6 @@
 use crate::Direction;
 
-fn read(path: &str) -> String {
+pub fn read(path: &str) -> String {
     std::fs::read_to_string(&path).unwrap()
 }
 
