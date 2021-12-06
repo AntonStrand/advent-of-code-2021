@@ -15,6 +15,13 @@ pub fn read_number_input(path: &str) -> Vec<u32> {
         .collect()
 }
 
+pub fn read_comma_separated_number_input(path: &str) -> Vec<u32> {
+    read(path)
+        .split(",")
+        .map(|n| n.parse::<u32>().unwrap())
+        .collect()
+}
+
 pub fn read_directions(path: &str) -> Vec<Direction> {
     read(path).lines().map(Direction::from_str).collect()
 }
