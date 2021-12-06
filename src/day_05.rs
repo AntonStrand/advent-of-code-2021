@@ -105,7 +105,7 @@ impl Coordinate {
     }
 }
 
-fn number_of_overlapping_coordinates(coordinates: Vec<Coordinate>) -> u32 {
+fn number_of_overlapping_coordinates(coordinates: Vec<Coordinate>) -> u64 {
     let mut counter = HashMap::new();
 
     coordinates.iter().for_each(|c| {
@@ -116,7 +116,7 @@ fn number_of_overlapping_coordinates(coordinates: Vec<Coordinate>) -> u32 {
     (counter
         .iter()
         .filter_map(|(&&coordinate, &count)| if count > 1 { Some(coordinate) } else { None })
-        .count()) as u32
+        .count()) as u64
 }
 
 fn get_coordinates<F: Fn(&Line) -> Option<Vec<Coordinate>>>(
@@ -126,11 +126,11 @@ fn get_coordinates<F: Fn(&Line) -> Option<Vec<Coordinate>>>(
     lines.iter().filter_map(getter).flatten().collect()
 }
 
-fn part01(lines: &Vec<Line>) -> u32 {
+fn part01(lines: &Vec<Line>) -> u64 {
     number_of_overlapping_coordinates(get_coordinates(Line::straight_coordinates, lines))
 }
 
-fn part02(lines: &Vec<Line>) -> u32 {
+fn part02(lines: &Vec<Line>) -> u64 {
     number_of_overlapping_coordinates(get_coordinates(Line::all_coordinates, lines))
 }
 

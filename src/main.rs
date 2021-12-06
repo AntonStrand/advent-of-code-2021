@@ -1,13 +1,13 @@
 use std::env;
 
-use advent_of_code::{day_01, day_02, day_03, day_04, day_05, Solution};
+use advent_of_code::{day_01, day_02, day_03, day_04, day_05, day_06, Solution};
 
 fn main() {
-    let days = [day_01, day_02, day_03, day_04, day_05];
+    let days = [day_01, day_02, day_03, day_04, day_05, day_06];
 
     match parse_arg_day() {
-        Some(day) => solve_day(&days, day),
-        None => days.iter().for_each(solve),
+        Some(day) => Solution::view(solve_day(&days, day)),
+        None => Solution::view_all(days.iter().map(solve).collect()),
     }
 }
 
@@ -18,12 +18,12 @@ fn parse_arg_day() -> Option<usize> {
         .map(|day| day.parse::<usize>().unwrap() - 1)
 }
 
-fn solve_day<F: Fn() -> Solution>(days: &[F], day: usize) {
+fn solve_day<F: Fn() -> Solution>(days: &[F], day: usize) -> Solution {
     days.get(day)
         .map(solve)
-        .unwrap_or_else(|| println!("You need to provide a day between 1 - {}", days.len()))
+        .unwrap_or_else(|| panic!("You need to provide a day between 1 - {}", days.len()))
 }
 
-fn solve<F: Fn() -> Solution>(solve: F) {
-    println!("{}", solve());
+fn solve<F: Fn() -> Solution>(solve: F) -> Solution {
+    solve()
 }

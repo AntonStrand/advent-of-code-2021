@@ -1,6 +1,6 @@
 use crate::{read_directions, Direction, Solution};
 
-fn part01(directions: &Vec<Direction>) -> u32 {
+fn part01(directions: &Vec<Direction>) -> u64 {
     let (position, depth) = directions
         .iter()
         .fold((0, 0), |(position, depth), direction| match direction {
@@ -8,10 +8,10 @@ fn part01(directions: &Vec<Direction>) -> u32 {
             Direction::Down(n) => (position, depth + n),
             Direction::Up(n) => (position, depth - n),
         });
-    position * depth
+    (position * depth) as u64
 }
 
-fn part02(directions: &Vec<Direction>) -> u32 {
+fn part02(directions: &Vec<Direction>) -> u64 {
     let (position, depth, _) = directions.iter().fold(
         (0, 0, 0),
         |(position, depth, aim), direction| match direction {
@@ -20,7 +20,7 @@ fn part02(directions: &Vec<Direction>) -> u32 {
             Direction::Up(n) => (position, depth, aim - n),
         },
     );
-    position * depth
+    (position * depth) as u64
 }
 
 pub fn day_02() -> Solution {

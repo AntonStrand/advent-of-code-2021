@@ -54,7 +54,7 @@ fn get_rating<'a, F: Fn(&Vec<&str>) -> &'a str>(f: F, input: &Vec<Vec<&str>>) ->
     to_decimal(binaries.get(0).unwrap().join(""))
 }
 
-fn part01(input: &Vec<String>) -> u32 {
+fn part01(input: &Vec<String>) -> u64 {
     let (gamma_rate, epsilon_rate) = to_columns(&split_binaries(input)).iter().fold(
         (String::from(""), String::from("")),
         |(gamma_rate, epsilon_rate), column| {
@@ -65,16 +65,16 @@ fn part01(input: &Vec<String>) -> u32 {
         },
     );
 
-    to_decimal(gamma_rate) * to_decimal(epsilon_rate)
+    (to_decimal(gamma_rate) * to_decimal(epsilon_rate)) as u64
 }
 
-fn part02(input: &Vec<String>) -> u32 {
+fn part02(input: &Vec<String>) -> u64 {
     let parsed = split_binaries(input);
 
     let oxygen = get_rating(most_common, &parsed);
     let co2 = get_rating(least_common, &parsed);
 
-    oxygen * co2
+    (oxygen * co2) as u64
 }
 
 pub fn day_03() -> Solution {
