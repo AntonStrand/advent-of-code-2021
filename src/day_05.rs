@@ -153,12 +153,12 @@ mod tests {
         assert_eq!(
             Line::new(&String::from("0,9 -> 5,9")),
             Some(Line::Straight(vec![
-                Coordinate::new(0, 9),
-                Coordinate::new(1, 9),
-                Coordinate::new(2, 9),
-                Coordinate::new(3, 9),
+                Coordinate::new(5, 9),
                 Coordinate::new(4, 9),
-                Coordinate::new(5, 9)
+                Coordinate::new(3, 9),
+                Coordinate::new(2, 9),
+                Coordinate::new(1, 9),
+                Coordinate::new(0, 9),
             ]))
         )
     }
@@ -180,11 +180,11 @@ mod tests {
         assert_eq!(
             Line::new(&String::from("0,3 -> 0,7")),
             Some(Line::Straight(vec![
-                Coordinate::new(0, 3),
-                Coordinate::new(0, 4),
-                Coordinate::new(0, 5),
-                Coordinate::new(0, 6),
                 Coordinate::new(0, 7),
+                Coordinate::new(0, 6),
+                Coordinate::new(0, 5),
+                Coordinate::new(0, 4),
+                Coordinate::new(0, 3),
             ]))
         )
     }
@@ -206,9 +206,9 @@ mod tests {
         assert_eq!(
             Line::new(&String::from("1,1 -> 3,3")),
             Some(Line::Diagonal(vec![
-                Coordinate::new(1, 1),
-                Coordinate::new(2, 2),
                 Coordinate::new(3, 3),
+                Coordinate::new(2, 2),
+                Coordinate::new(1, 1),
             ]))
         )
     }
