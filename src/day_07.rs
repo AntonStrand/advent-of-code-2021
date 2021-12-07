@@ -40,11 +40,8 @@ fn part01(input: &Vec<u32>) -> u64 {
 }
 
 fn part02(input: &Vec<u32>) -> u64 {
-    means(input)
-        .iter()
-        .map(|&position| calc_fuel(calc_trip, position, input))
-        .min()
-        .unwrap()
+    let [cost_1, cost_2] = means(input).map(|x| calc_fuel(calc_trip, x, input));
+    cost_1.min(cost_2)
 }
 
 pub fn day_07() -> Solution {
