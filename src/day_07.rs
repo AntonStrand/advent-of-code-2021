@@ -49,6 +49,28 @@ pub fn day_07() -> Solution {
     Solution::new(7, part01(&input), part02(&input))
 }
 
+/* Brute force solution - for fun */
+
+#[allow(dead_code)]
+fn brute<F: Fn(u32, u32) -> u64 + Copy>(calc: F, input: &Vec<u32>) -> u64 {
+    let min = *input.iter().min().unwrap();
+    let max = *input.iter().max().unwrap() + 1;
+
+    (min..max)
+        .into_iter()
+        .fold(u64::MAX, |cost, x| cost.min(calc_fuel(calc, &input, x)))
+}
+
+#[allow(dead_code)]
+fn brute_01(input: &Vec<u32>) -> u64 {
+    brute(get_steps, input)
+}
+
+#[allow(dead_code)]
+fn brute_02(input: &Vec<u32>) -> u64 {
+    brute(calc_trip, input)
+}
+
 #[cfg(test)]
 mod tests {
     // Note this useful idiom: importing names from outer (for mod tests) scope.
@@ -102,6 +124,12 @@ mod tests {
 
     #[test]
     fn test_part02_final() {
+        let input = &read_comma_separated_number_input("./input/day_07.txt");
+        assert_eq!(part02(&input), 100220525)
+    }
+
+    #[test]
+    fn test_brute_02() {
         let input = &read_comma_separated_number_input("./input/day_07.txt");
         assert_eq!(part02(&input), 100220525)
     }
