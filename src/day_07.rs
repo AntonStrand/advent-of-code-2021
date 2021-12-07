@@ -2,23 +2,11 @@ use crate::{read_comma_separated_number_input, Solution};
 
 /* Find position */
 
-fn means(input: &Vec<u32>) -> Vec<u32> {
-    let sum = input.iter().fold(0f32, |sum, x| sum + (*x as f32));
-    let len = input.len() as f32;
-
-    if len == 0.0 {
-        vec![0u32]
-    } else {
-        let mean = sum / len;
-        let floor = mean.floor() as u32;
-        let ceil = mean.ceil() as u32;
-
-        if floor == ceil {
-            vec![floor]
-        } else {
-            vec![floor, ceil]
-        }
-    }
+fn means(input: &Vec<u32>) -> [u32; 2] {
+    // Division by 0 is fine as long as the result is a float that will be converted to a u32.
+    let mean = input.iter().sum::<u32>() as f32 / input.len() as f32;
+    // floor and ceil will turn NaN to 0 when converted to u32.
+    [mean.floor() as u32, mean.ceil() as u32]
 }
 
 fn median(input: &Vec<u32>) -> u32 {
@@ -26,19 +14,19 @@ fn median(input: &Vec<u32>) -> u32 {
     let mut numbers = input.clone();
     numbers.sort();
 
+    // In this case we will get one index
     *numbers.get(index).unwrap()
 }
 
 /* Calculate fuel consumption */
 
 fn get_steps(from: u32, to: u32) -> u64 {
-    (from as i32 - to as i32).abs() as u64
+    (if from > to { from - to } else { to - from }) as u64
 }
 
 fn calc_trip(from: u32, to: u32) -> u64 {
-    let steps = get_steps(from, to) + 1;
-
-    (0..steps).into_iter().fold(0u64, |fuel, step| fuel + step)
+    let steps = get_steps(from, to);
+    (steps * (steps + 1)) / 2
 }
 
 fn calc_fuel<F: Fn(u32, u32) -> u64>(calculator: F, position: u32, positions: &Vec<u32>) -> u64 {
@@ -76,7 +64,12 @@ mod tests {
 
     #[test]
     fn test_mean_even() {
-        assert_eq!(means(&vec![1, 1, 1, 1]), [1])
+        assert_eq!(means(&vec![1, 1, 1, 1]), [1, 1])
+    }
+
+    #[test]
+    fn test_mean_empty() {
+        assert_eq!(means(&vec![]), [0, 0])
     }
 
     #[test]
