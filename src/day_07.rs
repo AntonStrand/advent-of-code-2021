@@ -119,6 +119,12 @@ mod tests {
     }
 
     #[test]
+    fn test_brute_01() {
+        let input = &read_comma_separated_number_input("./input/day_07.txt");
+        assert_eq!(brute_01(&input), 348664)
+    }
+
+    #[test]
     fn test_part02() {
         assert_eq!(part02(&vec![16, 1, 2, 0, 4, 2, 7, 1, 2, 14]), 168)
     }
