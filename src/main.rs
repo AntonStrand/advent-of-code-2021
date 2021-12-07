@@ -1,9 +1,9 @@
 use std::env;
 
-use advent_of_code::{day_01, day_02, day_03, day_04, day_05, day_06, Solution};
+use advent_of_code::{day_01, day_02, day_03, day_04, day_05, day_06, day_07, Solution};
 
 fn main() {
-    let days = [day_01, day_02, day_03, day_04, day_05, day_06];
+    let days = [day_01, day_02, day_03, day_04, day_05, day_06, day_07];
 
     match parse_arg_day() {
         Some(day) => Solution::view(solve_day(&days, day)),
