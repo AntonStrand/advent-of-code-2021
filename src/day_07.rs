@@ -29,19 +29,19 @@ fn calc_trip(from: u32, to: u32) -> u64 {
     (steps * (steps + 1)) / 2
 }
 
-fn calc_fuel<F: Fn(u32, u32) -> u64>(calculator: F, position: u32, positions: &Vec<u32>) -> u64 {
+fn calc_fuel<F: Fn(u32, u32) -> u64>(calculator: F, positions: &Vec<u32>, position: u32) -> u64 {
     positions.iter().map(|&x| calculator(position, x)).sum()
 }
 
 /* Solutions */
 
 fn part01(input: &Vec<u32>) -> u64 {
-    calc_fuel(get_steps, median(input), input)
+    calc_fuel(get_steps, input, median(input))
 }
 
 fn part02(input: &Vec<u32>) -> u64 {
-    let [cost_1, cost_2] = means(input).map(|x| calc_fuel(calc_trip, x, input));
-    cost_1.min(cost_2)
+    let fuel_cost = means(input).map(|x| calc_fuel(calc_trip, input, x));
+    fuel_cost[0].min(fuel_cost[1])
 }
 
 pub fn day_07() -> Solution {
