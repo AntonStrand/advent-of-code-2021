@@ -25,5 +25,6 @@ fn part02(directions: &Vec<Direction>) -> u64 {
 
 pub fn day_02() -> Solution {
     let input = read_directions("./input/day_02.txt");
-    Solution::new(2, part01(&input), part02(&input))
+    let timer = std::time::Instant::now();
+    Solution::new(2, part01(&input), part02(&input), timer.elapsed())
 }

@@ -95,5 +95,6 @@ fn part02(input: &CountdownState) -> u64 {
 
 pub fn day_06() -> Solution {
     let input = CountdownState::new(read_comma_separated_number_input("./input/day_06.txt"));
-    Solution::new(6, part01(&input), part02(&input))
+    let timer = std::time::Instant::now();
+    Solution::new(6, part01(&input), part02(&input), timer.elapsed())
 }

@@ -139,8 +139,8 @@ pub fn day_05() -> Solution {
         .iter()
         .filter_map(Line::new)
         .collect();
-
-    Solution::new(5, part01(&input), part02(&input))
+    let timer = std::time::Instant::now();
+    Solution::new(5, part01(&input), part02(&input), timer.elapsed())
 }
 
 #[cfg(test)]

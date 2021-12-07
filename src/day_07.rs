@@ -46,7 +46,8 @@ fn part02(input: &Vec<u32>) -> u64 {
 
 pub fn day_07() -> Solution {
     let input = read_comma_separated_number_input("./input/day_07.txt");
-    Solution::new(7, part01(&input), part02(&input))
+    let timer = Instant::now();
+    Solution::new(7, part01(&input), part02(&input), timer.elapsed())
 }
 
 /* Brute force solution - for fun */

@@ -28,5 +28,6 @@ fn part02(input: &Vec<u32>) -> u64 {
 
 pub fn day_01() -> Solution {
     let input = read_number_input("./input/day_01.txt");
-    Solution::new(1, part01(&input), part02(&input))
+    let timer = std::time::Instant::now();
+    Solution::new(1, part01(&input), part02(&input), timer.elapsed())
 }

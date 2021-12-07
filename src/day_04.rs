@@ -108,7 +108,8 @@ fn part02(input: &(Vec<Board>, Vec<u8>)) -> u64 {
 
 pub fn day_04() -> Solution {
     let input = read_input();
-    Solution::new(4, part01(&input), part02(&input))
+    let timer = std::time::Instant::now();
+    Solution::new(4, part01(&input), part02(&input), timer.elapsed())
 }
 
 #[cfg(test)]

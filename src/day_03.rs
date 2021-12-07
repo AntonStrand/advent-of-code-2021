@@ -79,7 +79,8 @@ fn part02(input: &Vec<String>) -> u64 {
 
 pub fn day_03() -> Solution {
     let input = read_lines("./input/day_03.txt");
-    Solution::new(3, part01(&input), part02(&input))
+    let timer = std::time::Instant::now();
+    Solution::new(3, part01(&input), part02(&input), timer.elapsed())
 }
 
 #[cfg(test)]
