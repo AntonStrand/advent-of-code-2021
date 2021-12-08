@@ -3,6 +3,7 @@ use std::{
     time::Duration,
 };
 
+#[derive(Clone)]
 pub struct Solution(u8, u64, u64, Duration);
 
 impl Solution {
