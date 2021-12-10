@@ -42,3 +42,11 @@ pub fn sort_desc<T: Ord + Copy>(vec: Vec<T>) -> Vec<T> {
     v.sort_by_key(|&w| std::cmp::Reverse(w));
     v
 }
+
+pub fn pipe<A, B, C, G, F>(f: F, g: G) -> impl Fn(A) -> C
+where
+    F: Fn(A) -> B,
+    G: Fn(B) -> C,
+{
+    move |x| g(f(x))
+}
