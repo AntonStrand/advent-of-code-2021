@@ -142,7 +142,6 @@ impl State {
 /* Solutions */
 
 fn part01(input: &State) -> u64 {
-    println!("{:?}", Grid::positions());
     let final_state = (0..100)
         .into_iter()
         .fold(input.clone(), |state, _| state.step());
