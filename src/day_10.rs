@@ -223,7 +223,6 @@ mod tests {
     }
 
     #[test]
-    #[ignore]
     fn test_part02() {
         let input = read_lines("./input/day_10.txt");
         assert_eq!(part02(&input), 3515583998)
