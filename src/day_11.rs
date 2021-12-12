@@ -18,6 +18,7 @@ impl Grid {
     fn positions() -> [Point; 100] {
         let mut pos = [Point(0, 0); 100];
         let mut index = 0;
+
         for y in 0..10 {
             for x in 0..10 {
                 pos[index] = Point(x, y);
@@ -152,6 +153,7 @@ fn part01(input: &State) -> u64 {
 fn part02(input: &State) -> u64 {
     let mut state = *input;
     let mut step = 0;
+
     loop {
         step += 1;
         state = state.step();
