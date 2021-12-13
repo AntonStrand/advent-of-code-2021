@@ -1,74 +1,127 @@
 use std::collections::{HashMap, HashSet};
 
-use crate::{read_lines, Solution};
+use crate::{map_both, read_lines, Solution};
 
-fn is_big_cave(cave: &str) -> bool {
-    cave == cave.to_uppercase()
-}
-
-fn is_small_cave(cave: &str) -> bool {
-    !is_big_cave(cave)
-}
-
-fn add_path<'a>(
-    mut map: HashMap<&'a str, Vec<&'a str>>,
-    from: &'a str,
-    to: &'a str,
-) -> HashMap<&'a str, Vec<&'a str>> {
-    if to != "start" {
-        let edges = map.entry(from).or_insert(vec![]);
-        edges.push(to);
+fn add_path(mut map: HashMap<Cave, Vec<Cave>>, from: &Cave, to: &Cave) -> HashMap<Cave, Vec<Cave>> {
+    if to != &Cave::Start {
+        let edges = map.entry(from.to_owned()).or_insert(vec![]);
+        edges.push(to.to_owned());
     }
     map
 }
 
-fn create_map(lines: &Vec<String>) -> HashMap<&str, Vec<&str>> {
+fn create_map(lines: &Vec<String>) -> HashMap<Cave, Vec<Cave>> {
     let mut map = HashMap::new();
 
     for line in lines {
-        let (from, to) = line.split_once("-").unwrap();
-        map = add_path(map, to, from);
-        map = add_path(map, from, to);
+        let (from, to) = map_both(Cave::new, line.split_once("-").unwrap());
+        map = add_path(map, &to, &from);
+        map = add_path(map, &from, &to);
     }
 
     map
 }
 
-fn path_has_only_unique_small_caves(path: &Vec<&str>) -> bool {
-    let mut caves = HashSet::new();
-    for cave in path {
-        if is_small_cave(cave) {
-            if caves.contains(cave) {
-                return false;
-            } else {
-                caves.insert(cave);
-            }
+#[derive(Debug, PartialEq, Eq, Hash, Clone)]
+enum Cave {
+    Start,
+    End,
+    Big(String),
+    Small(String),
+}
+
+impl Cave {
+    fn new(cave: &str) -> Cave {
+        match cave {
+            "start" => Cave::Start,
+            "end" => Cave::End,
+            name if name.to_uppercase() == name => Cave::Big(name.to_string()),
+            name => Cave::Small(name.to_string()),
         }
     }
 
-    true
+    fn is_big(&self) -> bool {
+        match self {
+            &Cave::Big(_) => true,
+            _ => false,
+        }
+    }
+
+    fn is_small(&self) -> bool {
+        match self {
+            &Cave::Small(_) => true,
+            _ => false,
+        }
+    }
 }
 
-fn all_paths<'a, F: Fn(&Vec<&str>) -> bool>(
-    allow_visit_again: F,
-    map: HashMap<&'a str, Vec<&'a str>>,
-) -> Vec<Vec<&'a str>> {
+#[derive(Debug, Clone)]
+struct Path {
+    visited: HashSet<Cave>,
+    path: Vec<Cave>,
+    has_duplicate: bool,
+    allow_visit_again: bool,
+}
+
+impl Path {
+    fn new(allow_visit_again: bool) -> Path {
+        Path {
+            visited: HashSet::new(),
+            path: vec![Cave::Start],
+            has_duplicate: false,
+            allow_visit_again,
+        }
+    }
+
+    fn last(&self) -> Cave {
+        self.path.last().unwrap().to_owned()
+    }
+
+    fn push(&self, cave: &Cave) -> Path {
+        let mut next_path = self.path[..].to_vec();
+        next_path.push(cave.to_owned());
+
+        let mut visited = self.visited.to_owned();
+        if cave.is_small() {
+            visited.insert(cave.to_owned());
+        }
+
+        Path {
+            visited: visited,
+            path: next_path,
+            has_duplicate: if self.has_duplicate {
+                self.has_duplicate
+            } else {
+                self.visited.contains(cave)
+            },
+            allow_visit_again: self.allow_visit_again,
+        }
+    }
+
+    fn allow_adjacent(path: &Path, cave: &Cave) -> bool {
+        if path.allow_visit_again {
+            path.has_duplicate || !path.visited.contains(cave) || cave.is_big()
+        } else {
+            !path.visited.contains(cave) || cave.is_big()
+        }
+    }
+}
+
+fn all_paths(allow_visit_again: bool, map: HashMap<Cave, Vec<Cave>>) -> Vec<Path> {
     let mut paths = vec![];
     let mut stack = Vec::new();
-    stack.push(vec!["start"]);
+    stack.push(Path::new(allow_visit_again));
 
     while !stack.is_empty() {
         let path = stack.pop().unwrap();
-        let cave = *path.last().unwrap();
+        let cave = path.last();
 
-        if cave == "end" {
+        if cave == Cave::End {
             paths.push(path);
         } else {
-            for &adjacent in map.get(cave).unwrap_or(&vec![]) {
-                if allow_visit_again(&path) || !path.contains(&adjacent) || is_big_cave(adjacent) {
-                    let mut next_path = path.clone();
-                    next_path.push(adjacent);
-                    stack.push(next_path);
+            for adjacent in map.get(&cave).unwrap_or(&vec![]) {
+                if Path::allow_adjacent(&path, &adjacent) {
+                    stack.push(path.push(adjacent));
                 }
             }
         }
@@ -80,11 +133,11 @@ fn all_paths<'a, F: Fn(&Vec<&str>) -> bool>(
 /* Solutions */
 
 fn part01(input: &Vec<String>) -> u64 {
-    all_paths(|_| false, create_map(input)).len() as u64
+    all_paths(false, create_map(input)).len() as u64
 }
 
 fn part02(input: &Vec<String>) -> u64 {
-    all_paths(path_has_only_unique_small_caves, create_map(input)).len() as u64
+    all_paths(true, create_map(input)).len() as u64
 }
 
 pub fn day_12() -> Solution {
