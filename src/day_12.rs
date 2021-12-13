@@ -68,8 +68,8 @@ impl Path {
         }
     }
 
-    fn last(&self) -> Cave {
-        self.path.last().unwrap().to_owned()
+    fn last(&self) -> &Cave {
+        self.path.last().unwrap()
     }
 
     fn append(&self, cave: &Cave) -> Path {
@@ -96,16 +96,20 @@ impl Path {
         }
     }
 
-    fn allow_adjacent(path: &Path, cave: &Cave) -> bool {
+    fn allows_adjacent(path: &Path, cave: &Cave) -> bool {
         if path.allow_visit_again {
             !path.has_duplicate || !path.visited.contains(cave)
         } else {
             !path.visited.contains(cave)
         }
     }
+
+    fn has_reached_end(cave: &Cave) -> bool {
+        cave == &Cave::End
+    }
 }
 
-fn all_paths(allow_visit_again: bool, cave_system: &CaveSystem) -> Vec<Path> {
+fn count_paths(allow_visit_again: bool, cave_system: &CaveSystem) -> usize {
     let mut paths = vec![];
     let mut stack = Vec::new();
     stack.push(Path::new(allow_visit_again));
@@ -114,28 +118,28 @@ fn all_paths(allow_visit_again: bool, cave_system: &CaveSystem) -> Vec<Path> {
         let path = stack.pop().unwrap();
         let cave = path.last();
 
-        if cave == Cave::End {
+        if Path::has_reached_end(cave) {
             paths.push(path);
         } else {
-            for adjacent in cave_system.get(&cave).unwrap_or(&vec![]) {
-                if Path::allow_adjacent(&path, &adjacent) {
+            for adjacent in cave_system.get(cave).unwrap_or(&vec![]) {
+                if Path::allows_adjacent(&path, &adjacent) {
                     stack.push(path.append(adjacent));
                 }
             }
         }
     }
 
-    paths
+    paths.len()
 }
 
 /* Solutions */
 
 fn part01(cave_system: &CaveSystem) -> usize {
-    all_paths(false, cave_system).len()
+    count_paths(false, cave_system)
 }
 
 fn part02(cave_system: &CaveSystem) -> usize {
-    all_paths(true, cave_system).len()
+    count_paths(true, cave_system)
 }
 
 pub fn day_12() -> Solution {
