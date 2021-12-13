@@ -4,11 +4,21 @@ use std::{
 };
 
 #[derive(Clone)]
-pub struct Solution(u8, u64, u64, Duration);
+pub struct Solution {
+    day: String,
+    part_1: String,
+    part_2: String,
+    duration: Duration,
+}
 
 impl Solution {
-    pub fn new(day: u8, part1: u64, part2: u64, duration: Duration) -> Solution {
-        Solution(day, part1, part2, duration)
+    pub fn new<T: ToString>(day: u8, part_1: T, part_2: T, duration: Duration) -> Solution {
+        Solution {
+            day: day.to_string(),
+            part_1: part_1.to_string(),
+            part_2: part_2.to_string(),
+            duration,
+        }
     }
 
     pub fn view_all(solutions: Vec<Solution>) {
@@ -36,11 +46,11 @@ impl Display for Solution {
         write!(
             f,
             "|  {: <2} | {: >10} | {: >15} | {: >15} | {: >15} |",
-            self.0.to_string(),
-            self.1.to_string(),
-            self.2.to_string(),
-            self.3.as_micros(),
-            self.3.as_nanos(),
+            self.day,
+            self.part_1,
+            self.part_2,
+            self.duration.as_micros(),
+            self.duration.as_nanos(),
         )
     }
 }
