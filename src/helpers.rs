@@ -17,6 +17,10 @@ pub fn map_both<A, B, F: Fn(A) -> B>(f: F, (fst, snd): (A, A)) -> (B, B) {
     (f(fst), f(snd))
 }
 
+pub fn map_snd<A, B, C, F: Fn(B) -> C>(f: F, (fst, snd): (A, B)) -> (A, C) {
+    (fst, f(snd))
+}
+
 pub fn parse_number_string<N>(string: &String) -> Vec<N>
 where
     N: std::str::FromStr,
@@ -27,14 +31,17 @@ where
             if n.is_empty() {
                 None
             } else {
-                Some(
-                    n.parse::<N>()
-                        .ok()
-                        .unwrap_or_else(|| panic!("Failed to parse number string")),
-                )
+                Some(unsafe_parse(n))
             }
         })
         .collect()
+}
+
+pub fn unsafe_parse<N: std::str::FromStr>(value: &str) -> N {
+    value
+        .parse::<N>()
+        .ok()
+        .unwrap_or_else(|| panic!("Failed to parse value: {}", value))
 }
 
 pub fn sort_desc<T: Ord + Copy>(vec: Vec<T>) -> Vec<T> {
