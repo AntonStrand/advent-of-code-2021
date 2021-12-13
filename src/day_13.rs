@@ -1,10 +1,22 @@
 use std::{
     collections::HashSet,
     fmt::{self, Display},
+    hash::{Hash, Hasher},
 };
 
 use crate::{map_both, map_snd, read, unsafe_parse, Solution};
 
+fn hash_to_char_str(hash: u64) -> &'static str {
+    match hash {
+        6867693118687141663 => "H",
+        6876405955879760556 => "Z",
+        1429428095340992053 => "K",
+        12493310367934192866 => "F",
+        14882858084180546402 => "E",
+        10981057960959392421 => "J",
+        _ => panic!("Not yet implemented"),
+    }
+}
 #[derive(Debug, PartialEq, Eq, Hash, Clone)]
 struct Coordinate {
     x: u16,
@@ -85,6 +97,33 @@ impl Paper {
 
         untouched.union(&folded).map(|c| c.to_owned()).collect()
     }
+
+    fn to_letters(&self) -> String {
+        let mut letters = vec![];
+
+        for offset in (0..self.width + 1).step_by(5) {
+            let mut letter = [[" "; 4]; 6];
+            let mut hasher = std::collections::hash_map::DefaultHasher::new();
+
+            for y in 0..6 {
+                for x in 0..4 {
+                    letter[y][x] = if self
+                        .coordinates
+                        .contains(&Coordinate::new(x as u16 + offset, y as u16))
+                    {
+                        "#"
+                    } else {
+                        "."
+                    }
+                }
+            }
+
+            letter.map(|row| row.join("")).join("").hash(&mut hasher);
+            letters.push(hash_to_char_str(hasher.finish()));
+        }
+
+        letters.join("")
+    }
 }
 
 impl Display for Paper {
@@ -134,21 +173,19 @@ fn parse(input: String) -> (Paper, Vec<Instruction>) {
 
 /* Solutions */
 
-fn part01((paper, instructions): &(Paper, Vec<Instruction>)) -> u64 {
-    paper.fold(instructions.first().unwrap()).coordinates.len() as u64
+fn part01((paper, instructions): &(Paper, Vec<Instruction>)) -> String {
+    paper
+        .fold(instructions.first().unwrap())
+        .coordinates
+        .len()
+        .to_string()
 }
 
-fn part02((_paper, _instructions): &(Paper, Vec<Instruction>)) -> u64 {
-    // println!(
-    //     "{}",
-    //     instructions
-    //         .iter()
-    //         .fold(paper.to_owned(), |p, instruction| p.fold(instruction))
-    // );
-
-    // HZKHFEJZ
-
-    0
+fn part02((paper, instructions): &(Paper, Vec<Instruction>)) -> String {
+    instructions
+        .iter()
+        .fold(paper.to_owned(), |p, instruction| p.fold(instruction))
+        .to_letters()
 }
 
 pub fn day_13() -> Solution {
