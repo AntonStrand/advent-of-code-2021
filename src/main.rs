@@ -1,13 +1,14 @@
 use std::env;
 
 use advent_of_code::{
-    day_01, day_02, day_03, day_04, day_05, day_06, day_07, day_08, day_09, day_10, day_11,
+    day_01, day_02, day_03, day_04, day_05, day_06, day_07, day_08, day_09, day_10, day_11, day_12,
     Solution,
 };
 
 fn main() {
     let days = [
         day_01, day_02, day_03, day_04, day_05, day_06, day_07, day_08, day_09, day_10, day_11,
+        day_12,
     ];
 
     match parse_arg_day() {
