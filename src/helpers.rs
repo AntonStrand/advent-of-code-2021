@@ -57,3 +57,7 @@ where
 {
     move |x| g(f(x))
 }
+
+pub fn is_upper(string: &str) -> bool {
+    string.to_uppercase() == string
+}

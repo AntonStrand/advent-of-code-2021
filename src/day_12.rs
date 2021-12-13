@@ -1,6 +1,6 @@
 use std::collections::{HashMap, HashSet};
 
-use crate::{map_both, read_lines, Solution};
+use crate::{is_upper, map_both, read_lines, Solution};
 
 fn add_path(mut map: HashMap<Cave, Vec<Cave>>, from: &Cave, to: &Cave) -> HashMap<Cave, Vec<Cave>> {
     if to != &Cave::Start {
@@ -35,15 +35,8 @@ impl Cave {
         match cave {
             "start" => Cave::Start,
             "end" => Cave::End,
-            name if name.to_uppercase() == name => Cave::Big(name.to_string()),
+            name if is_upper(name) => Cave::Big(name.to_string()),
             name => Cave::Small(name.to_string()),
-        }
-    }
-
-    fn is_big(&self) -> bool {
-        match self {
-            &Cave::Big(_) => true,
-            _ => false,
         }
     }
 
@@ -77,32 +70,35 @@ impl Path {
         self.path.last().unwrap().to_owned()
     }
 
-    fn push(&self, cave: &Cave) -> Path {
-        let mut next_path = self.path[..].to_vec();
-        next_path.push(cave.to_owned());
+    fn append(&self, cave: &Cave) -> Path {
+        let mut path = self.path[..].to_vec();
+        path.push(cave.to_owned());
 
         let mut visited = self.visited.to_owned();
+
         if cave.is_small() {
             visited.insert(cave.to_owned());
         }
 
+        let has_duplicate = if self.has_duplicate {
+            self.has_duplicate
+        } else {
+            self.visited.contains(cave)
+        };
+
         Path {
-            visited: visited,
-            path: next_path,
-            has_duplicate: if self.has_duplicate {
-                self.has_duplicate
-            } else {
-                self.visited.contains(cave)
-            },
+            visited,
+            path,
+            has_duplicate,
             allow_visit_again: self.allow_visit_again,
         }
     }
 
     fn allow_adjacent(path: &Path, cave: &Cave) -> bool {
         if path.allow_visit_again {
-            path.has_duplicate || !path.visited.contains(cave) || cave.is_big()
+            !path.has_duplicate || !path.visited.contains(cave)
         } else {
-            !path.visited.contains(cave) || cave.is_big()
+            !path.visited.contains(cave)
         }
     }
 }
@@ -121,7 +117,7 @@ fn all_paths(allow_visit_again: bool, map: HashMap<Cave, Vec<Cave>>) -> Vec<Path
         } else {
             for adjacent in map.get(&cave).unwrap_or(&vec![]) {
                 if Path::allow_adjacent(&path, &adjacent) {
-                    stack.push(path.push(adjacent));
+                    stack.push(path.append(adjacent));
                 }
             }
         }
@@ -132,12 +128,12 @@ fn all_paths(allow_visit_again: bool, map: HashMap<Cave, Vec<Cave>>) -> Vec<Path
 
 /* Solutions */
 
-fn part01(input: &Vec<String>) -> u64 {
-    all_paths(false, create_map(input)).len() as u64
+fn part01(input: &Vec<String>) -> usize {
+    all_paths(false, create_map(input)).len()
 }
 
-fn part02(input: &Vec<String>) -> u64 {
-    all_paths(true, create_map(input)).len() as u64
+fn part02(input: &Vec<String>) -> usize {
+    all_paths(true, create_map(input)).len()
 }
 
 pub fn day_12() -> Solution {
