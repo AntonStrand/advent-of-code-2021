@@ -53,7 +53,7 @@ impl Cave {
 #[derive(Debug, Clone)]
 struct Path {
     visited: HashSet<Cave>,
-    path: Vec<Cave>,
+    current: Cave,
     has_duplicate: bool,
     allow_visit_again: bool,
 }
@@ -62,20 +62,17 @@ impl Path {
     fn new(allow_visit_again: bool) -> Path {
         Path {
             visited: HashSet::new(),
-            path: vec![Cave::Start],
+            current: Cave::Start,
             has_duplicate: false,
             allow_visit_again,
         }
     }
 
-    fn last(&self) -> &Cave {
-        self.path.last().unwrap()
+    fn current_cave(&self) -> &Cave {
+        &self.current
     }
 
     fn append(&self, cave: &Cave) -> Path {
-        let mut path = self.path[..].to_vec();
-        path.push(cave.to_owned());
-
         let mut visited = self.visited.to_owned();
 
         if cave.is_small() {
@@ -90,7 +87,7 @@ impl Path {
 
         Path {
             visited,
-            path,
+            current: cave.to_owned(),
             has_duplicate,
             allow_visit_again: self.allow_visit_again,
         }
@@ -116,7 +113,7 @@ fn count_paths(allow_visit_again: bool, cave_system: &CaveSystem) -> usize {
 
     while !stack.is_empty() {
         let path = stack.pop().unwrap();
-        let cave = path.last();
+        let cave = path.current_cave();
 
         if Path::has_reached_end(cave) {
             paths.push(path);
