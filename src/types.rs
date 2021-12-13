@@ -26,18 +26,20 @@ impl Solution {
         println!("|                       🎄 Advent of Code - 2021 🎄                      |",);
         println!("├-----┬------------┬-----------------┬-----------------┬-----------------┤",);
         println!(
-            "| {: <3} | {: >10} | {: >15} | {: >15} | {: >15} |",
+            "| {: >3} | {: >10} | {: >15} | {: >15} | {: >15} |",
             "Day", "Part 1", "Part 2", "Time (ms)", "Time (ns)"
         );
         println!("├-----┼------------┼-----------------┼-----------------┼-----------------┤",);
-        solutions
-            .iter()
-            .for_each(|solution| println!("{}", solution));
+        solutions.iter().for_each(Solution::print);
         println!("'-----┴------------┴-----------------┴-----------------┴-----------------'",);
     }
 
     pub fn view(solution: Solution) {
         Solution::view_all(vec![solution]);
+    }
+
+    fn print(solution: &Solution) {
+        println!("{}", solution);
     }
 }
 
@@ -45,7 +47,7 @@ impl Display for Solution {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
-            "|  {: <2} | {: >10} | {: >15} | {: >15} | {: >15} |",
+            "|  {: >2} | {: >10} | {: >15} | {: >15} | {: >15} |",
             self.day,
             self.part_1,
             self.part_2,

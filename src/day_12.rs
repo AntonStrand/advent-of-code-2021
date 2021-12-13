@@ -2,24 +2,26 @@ use std::collections::{HashMap, HashSet};
 
 use crate::{is_upper, map_both, read_lines, Solution};
 
-fn add_path(mut map: HashMap<Cave, Vec<Cave>>, from: &Cave, to: &Cave) -> HashMap<Cave, Vec<Cave>> {
+type CaveSystem = HashMap<Cave, Vec<Cave>>;
+
+fn add_path(mut case_system: CaveSystem, from: &Cave, to: &Cave) -> CaveSystem {
     if to != &Cave::Start {
-        let edges = map.entry(from.to_owned()).or_insert(vec![]);
+        let edges = case_system.entry(from.to_owned()).or_insert(vec![]);
         edges.push(to.to_owned());
     }
-    map
+    case_system
 }
 
-fn create_map(lines: &Vec<String>) -> HashMap<Cave, Vec<Cave>> {
-    let mut map = HashMap::new();
+fn create_map(lines: Vec<String>) -> CaveSystem {
+    let mut case_system = HashMap::new();
 
     for line in lines {
         let (from, to) = map_both(Cave::new, line.split_once("-").unwrap());
-        map = add_path(map, &to, &from);
-        map = add_path(map, &from, &to);
+        case_system = add_path(case_system, &to, &from);
+        case_system = add_path(case_system, &from, &to);
     }
 
-    map
+    case_system
 }
 
 #[derive(Debug, PartialEq, Eq, Hash, Clone)]
@@ -103,7 +105,7 @@ impl Path {
     }
 }
 
-fn all_paths(allow_visit_again: bool, map: HashMap<Cave, Vec<Cave>>) -> Vec<Path> {
+fn all_paths(allow_visit_again: bool, cave_system: &CaveSystem) -> Vec<Path> {
     let mut paths = vec![];
     let mut stack = Vec::new();
     stack.push(Path::new(allow_visit_again));
@@ -115,7 +117,7 @@ fn all_paths(allow_visit_again: bool, map: HashMap<Cave, Vec<Cave>>) -> Vec<Path
         if cave == Cave::End {
             paths.push(path);
         } else {
-            for adjacent in map.get(&cave).unwrap_or(&vec![]) {
+            for adjacent in cave_system.get(&cave).unwrap_or(&vec![]) {
                 if Path::allow_adjacent(&path, &adjacent) {
                     stack.push(path.append(adjacent));
                 }
@@ -128,16 +130,16 @@ fn all_paths(allow_visit_again: bool, map: HashMap<Cave, Vec<Cave>>) -> Vec<Path
 
 /* Solutions */
 
-fn part01(input: &Vec<String>) -> usize {
-    all_paths(false, create_map(input)).len()
+fn part01(cave_system: &CaveSystem) -> usize {
+    all_paths(false, cave_system).len()
 }
 
-fn part02(input: &Vec<String>) -> usize {
-    all_paths(true, create_map(input)).len()
+fn part02(cave_system: &CaveSystem) -> usize {
+    all_paths(true, cave_system).len()
 }
 
 pub fn day_12() -> Solution {
-    let input = read_lines("./input/day_12.txt");
+    let input = create_map(read_lines("./input/day_12.txt"));
     let timer = std::time::Instant::now();
     Solution::new(12, part01(&input), part02(&input), timer.elapsed())
 }
@@ -151,14 +153,14 @@ mod tests {
 
     #[test]
     fn test_part01() {
-        let input = read_lines("./input/day_12.txt");
+        let input = create_map(read_lines("./input/day_12.txt"));
         assert_eq!(part01(&input), 4691)
     }
 
     #[test]
     #[ignore]
     fn test_part02() {
-        let input = read_lines("./input/day_12.txt");
+        let input = create_map(read_lines("./input/day_12.txt"));
         assert_eq!(part02(&input), 140718)
     }
 }
