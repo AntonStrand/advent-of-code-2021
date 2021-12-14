@@ -1,23 +1,30 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, str::Chars};
 
-use crate::{map_both, map_snd, read, Solution};
+use crate::{map_pair, map_snd, read, Solution};
 
-type InsertionRules = HashMap<String, String>;
+type InsertionRules = HashMap<(char, char), char>;
+
+fn pair(mut chars: Chars) -> (char, char) {
+    (chars.next().unwrap(), chars.next().unwrap())
+}
 
 fn parse_insertion_rules(rules: &str) -> InsertionRules {
     rules
         .lines()
-        .map(|rule| map_both(String::from, rule.split_once(" -> ").unwrap()))
+        .map(|rule| {
+            let (from, mut to) = map_pair(|s| s.chars(), rule.split_once(" -> ").unwrap());
+            (pair(from), to.next().unwrap())
+        })
         .collect()
 }
 
-fn chunk(polymer: &String) -> Vec<(char, char)> {
-    let mut chunks = vec![];
+fn chunk(template: &str) -> HashMap<(char, char), usize> {
+    let mut chunks = HashMap::new();
     let mut previous: Option<char> = None;
 
-    for c in polymer.chars() {
+    for c in template.chars() {
         if let Some(p) = previous {
-            chunks.push((p, c));
+            *chunks.entry((p, c)).or_insert(0) += 1;
         }
         previous = Some(c);
     }
@@ -25,65 +32,58 @@ fn chunk(polymer: &String) -> Vec<(char, char)> {
     chunks
 }
 
-fn step(insertion_rules: &InsertionRules, polymer: &String) -> String {
-    chunk(polymer)
-        .iter()
-        .enumerate()
-        .map(|(i, (a, b))| {
-            format!(
-                "{}{}",
-                insertion_rules
-                    .get(&format!("{}{}", a, b))
-                    .map(|insert| (format!("{}{}", a, insert)))
-                    .unwrap_or(format!("{}{}", a, b))
-                    .to_owned(),
-                if i == polymer.len() - 2 {
-                    b.to_string()
-                } else {
-                    "".to_string()
-                }
-            )
-        })
-        .collect::<Vec<String>>()
-        .join("")
-}
+fn step(input: &String, steps: usize) -> usize {
+    let (template, rules) = map_snd(parse_insertion_rules, input.split_once("\n\n").unwrap());
 
-fn count_chars(input: String) -> HashMap<char, usize> {
-    let mut counter = HashMap::new();
+    // All characters except the first and last one are counted twice. Therefore I need to add one to both.
+    let first = template.chars().next().unwrap();
+    let last = template.chars().last().unwrap();
 
-    for c in input.chars() {
-        let count = counter.entry(c).or_insert(0);
-        *count += 1;
-    }
-
-    counter
-}
-
-fn find_min_max(input: String) -> (usize, usize) {
-    count_chars(input)
+    let (min, max) = (0..steps)
         .into_iter()
-        .fold((usize::MAX, usize::MIN), |(min, max), (c, count)| {
-            (min.min(count), max.max(count))
-        })
-}
+        .fold(chunk(template), |polymer_count, _| {
+            let mut frequency = polymer_count.clone();
 
-fn step_n(times: usize, template: String, insertion_rules: &InsertionRules) -> String {
-    (0..times).fold(template, |polymer, _| step(&insertion_rules, &polymer))
+            for ((a, b), count) in polymer_count.into_iter() {
+                if let Some(&c) = rules.get(&(a, b)) {
+                    *frequency.entry((a, c)).or_insert(0) += count;
+                    *frequency.entry((c, b)).or_insert(0) += count;
+                    *frequency.entry((a, b)).or_insert(0) -= count;
+                } else {
+                    *frequency.entry((a, b)).or_insert(0) += count;
+                }
+            }
+
+            frequency
+        })
+        .into_iter()
+        .fold(
+            // Add one to the last and first chars from the template
+            vec![(first, 1), (last, 1)]
+                .into_iter()
+                .collect::<HashMap<char, usize>>(),
+            |mut letters, ((a, b), count)| {
+                *letters.entry(a).or_insert(0) += count;
+                *letters.entry(b).or_insert(0) += count;
+                letters
+            },
+        )
+        .values()
+        .fold((usize::MAX, 0), |(min, max), &count| {
+            (min.min(count), max.max(count))
+        });
+
+    (max - min) / 2
 }
 
 /* Solutions */
 
 fn part01(input: &String) -> usize {
-    let (template, insertion_rules) =
-        map_snd(parse_insertion_rules, input.split_once("\n\n").unwrap());
-
-    let (min, max) = find_min_max(step_n(10, template.to_string(), &insertion_rules));
-
-    max - min
+    step(input, 10)
 }
 
-fn part02(_input: &String) -> usize {
-    0
+fn part02(input: &String) -> usize {
+    step(input, 40)
 }
 
 pub fn day_14() -> Solution {
@@ -100,28 +100,14 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_parse_insertion_rules() {
-        let input = "CH -> B\nHH -> N\nCB -> H";
-
-        let mut expected = InsertionRules::new();
-        expected.insert(String::from("CH"), String::from("B"));
-        expected.insert(String::from("HH"), String::from("N"));
-        expected.insert(String::from("CB"), String::from("H"));
-
-        assert_eq!(parse_insertion_rules(input), expected)
-    }
-
-    #[test]
-    #[ignore]
     fn test_part01() {
         let input = read("./input/day_14.txt");
-        assert_eq!(part01(&input), 4691)
+        assert_eq!(part01(&input), 2657)
     }
 
     #[test]
-    #[ignore]
     fn test_part02() {
         let input = read("./input/day_14.txt");
-        assert_eq!(part02(&input), 140718)
+        assert_eq!(part02(&input), 2911561572630)
     }
 }
