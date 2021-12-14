@@ -316,10 +316,15 @@ mod tests {
         assert_eq!(actual, expected)
     }
 
-    // #[test]
-    // #[ignore]
-    // fn test_part02() {
-    //     let input = read("./input/day_13.txt");
-    //     assert_eq!(part02(&input), 140718)
-    // }
+    #[test]
+    fn test_part01() {
+        let input = parse(read("./input/day_13.txt"));
+        assert_eq!(part01(&input), "675")
+    }
+
+    #[test]
+    fn test_part02() {
+        let input = parse(read("./input/day_13.txt"));
+        assert_eq!(part02(&input), "HZKHFEJZ")
+    }
 }
