@@ -21,6 +21,14 @@ pub fn map_snd<A, B, C, F: Fn(B) -> C>(f: F, (fst, snd): (A, B)) -> (A, C) {
     (fst, f(snd))
 }
 
+pub fn map_both<A, B, C, D, F, G>(f: F, g: G, (fst, snd): (A, B)) -> (C, D)
+where
+    F: Fn(A) -> C,
+    G: Fn(B) -> D,
+{
+    (f(fst), g(snd))
+}
+
 pub fn parse_number_string<N>(string: &String) -> Vec<N>
 where
     N: std::str::FromStr,

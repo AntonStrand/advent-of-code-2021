@@ -32,6 +32,7 @@ pub use day_13::day_13;
 pub use day_14::day_14;
 pub use helpers::is_upper;
 pub use helpers::map_both;
+pub use helpers::map_pair;
 pub use helpers::map_snd;
 pub use helpers::parse_number_string;
 pub use helpers::pipe;
