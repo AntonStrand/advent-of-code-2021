@@ -1,19 +1,20 @@
 use std::{collections::HashMap, str::Chars};
 
-use crate::{map_pair, map_snd, read, Solution};
-
-type InsertionRules = HashMap<(char, char), char>;
+use crate::{map_both, map_pair, map_snd, read, Solution};
 
 fn pair(mut chars: Chars) -> (char, char) {
     (chars.next().unwrap(), chars.next().unwrap())
 }
 
-fn parse_insertion_rules(rules: &str) -> InsertionRules {
+fn parse_insertion_rules(rules: &str) -> HashMap<(char, char), char> {
     rules
         .lines()
         .map(|rule| {
-            let (from, mut to) = map_pair(|s| s.chars(), rule.split_once(" -> ").unwrap());
-            (pair(from), to.next().unwrap())
+            map_both(
+                pair,
+                |mut cs| cs.next().unwrap(),
+                map_pair(|s| s.chars(), rule.split_once(" -> ").unwrap()),
+            )
         })
         .collect()
 }
