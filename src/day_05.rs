@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::{map_both, read_lines, Solution};
+use crate::{map_pair, read_lines, Solution};
 
 #[derive(Debug, PartialEq)]
 enum Line {
@@ -10,7 +10,7 @@ enum Line {
 
 impl Line {
     fn new(segment: &String) -> Option<Line> {
-        let (c1, c2) = map_both(Coordinate::from_str, segment.split_once(" -> ").unwrap());
+        let (c1, c2) = map_pair(Coordinate::from_str, segment.split_once(" -> ").unwrap());
         if Line::is_diagonal(c1, c2) {
             Some(Line::to_diagonal(c1, c2))
         } else if Line::is_horizontal(c1, c2) {

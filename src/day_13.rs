@@ -4,7 +4,7 @@ use std::{
     hash::{Hash, Hasher},
 };
 
-use crate::{map_both, map_snd, read, unsafe_parse, Solution};
+use crate::{map_pair, map_snd, read, unsafe_parse, Solution};
 
 fn hash_to_char_str(hash: u64) -> &'static str {
     match hash {
@@ -57,7 +57,7 @@ impl Paper {
         let mut coordinates = HashSet::new();
 
         for coordinate in input.lines() {
-            let (x, y) = map_both(unsafe_parse, coordinate.split_once(",").unwrap());
+            let (x, y) = map_pair(unsafe_parse, coordinate.split_once(",").unwrap());
 
             width = width.max(x);
             length = length.max(y);

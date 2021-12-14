@@ -13,7 +13,7 @@ pub fn to_columns<T: Copy>(input: &Vec<Vec<T>>) -> Vec<Vec<T>> {
     columns
 }
 
-pub fn map_both<A, B, F: Fn(A) -> B>(f: F, (fst, snd): (A, A)) -> (B, B) {
+pub fn map_pair<A, B, F: Fn(A) -> B>(f: F, (fst, snd): (A, A)) -> (B, B) {
     (f(fst), f(snd))
 }
 

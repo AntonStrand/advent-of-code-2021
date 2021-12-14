@@ -1,6 +1,6 @@
 use std::collections::{HashMap, HashSet};
 
-use crate::{is_upper, map_both, read_lines, Solution};
+use crate::{is_upper, map_pair, read_lines, Solution};
 
 type CaveSystem = HashMap<Cave, Vec<Cave>>;
 
@@ -16,7 +16,7 @@ fn create_map(lines: Vec<String>) -> CaveSystem {
     let mut case_system = HashMap::new();
 
     for line in lines {
-        let (from, to) = map_both(Cave::new, line.split_once("-").unwrap());
+        let (from, to) = map_pair(Cave::new, line.split_once("-").unwrap());
         case_system = add_path(case_system, &to, &from);
         case_system = add_path(case_system, &from, &to);
     }
