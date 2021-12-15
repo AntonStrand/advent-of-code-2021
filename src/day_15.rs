@@ -36,7 +36,7 @@ fn adjacent((x, y): (usize, usize)) -> [(usize, usize); 4] {
     ]
 }
 
-fn find_lowest_risk_level<const N: usize>(mut map: [[u8; N]; N]) -> u32 {
+fn find_lowest_risk_level<const N: usize>(mut map: [[u8; N]; N]) -> u16 {
     // Use Reverse to get the lowest instead of the highest risk.
     let mut heap = BinaryHeap::from(vec![(Reverse(0), (0, 0))]);
 
@@ -51,7 +51,7 @@ fn find_lowest_risk_level<const N: usize>(mut map: [[u8; N]; N]) -> u32 {
             .filter(is_in_grid::<N>)
             .for_each(|&(x, y)| {
                 if map[y][x] > 0 {
-                    heap.push((Reverse(risk + map[y][x] as u32), (x, y)));
+                    heap.push((Reverse(risk + map[y][x] as u16), (x, y)));
                     map[y][x] = 0; // "Mark as visited"
                 }
             })
@@ -86,11 +86,11 @@ fn scale_grid<const N: usize>(grid: &Grid) -> [[u8; N]; N] {
 // Default grid size.
 const GRID_SIZE: usize = 100;
 
-fn part01(grid: &Grid) -> u32 {
+fn part01(grid: &Grid) -> u16 {
     find_lowest_risk_level(*grid)
 }
 
-fn part02(grid: &Grid) -> u32 {
+fn part02(grid: &Grid) -> u16 {
     const N: usize = GRID_SIZE * 5;
     find_lowest_risk_level(scale_grid::<N>(grid))
 }
