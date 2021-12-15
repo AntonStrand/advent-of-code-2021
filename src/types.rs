@@ -32,6 +32,8 @@ impl Solution {
         println!("├-----┼------------┼-----------------┼-----------------┤",);
         solutions.iter().for_each(Solution::print);
         println!("|-----┴------------┴-----------------┴-----------------|",);
+        println!("| Total: {: >42} ms |", Solution::total_time(solutions));
+        println!("'------------------------------------------------------'",);
     }
 
     pub fn view(solution: Solution) {
@@ -46,6 +48,9 @@ impl Solution {
         nanos as f64 / 1_000_000.0
     }
 
+    fn total_time(solutions: Vec<Solution>) -> f64 {
+        Solution::time_to_millis(solutions.into_iter().map(|s| s.duration.as_nanos()).sum())
+    }
 }
 
 impl Display for Solution {
