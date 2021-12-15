@@ -22,16 +22,16 @@ impl Solution {
     }
 
     pub fn view_all(solutions: Vec<Solution>) {
-        println!(".------------------------------------------------------------------------.",);
-        println!("|                       🎄 Advent of Code - 2021 🎄                      |",);
-        println!("├-----┬------------┬-----------------┬-----------------┬-----------------┤",);
+        println!(".------------------------------------------------------.",);
+        println!("|              🎄 Advent of Code - 2021 🎄             |",);
+        println!("├-----┬------------┬-----------------┬-----------------┤",);
         println!(
-            "| {: >3} | {: >10} | {: >15} | {: >15} | {: >15} |",
-            "Day", "Part 1", "Part 2", "Time (µs)", "Time (ns)"
+            "| {: >3} | {: >10} | {: >15} | {: >15} |",
+            "Day", "Part 1", "Part 2", "Time (ms)"
         );
-        println!("├-----┼------------┼-----------------┼-----------------┼-----------------┤",);
+        println!("├-----┼------------┼-----------------┼-----------------┤",);
         solutions.iter().for_each(Solution::print);
-        println!("'-----┴------------┴-----------------┴-----------------┴-----------------'",);
+        println!("|-----┴------------┴-----------------┴-----------------|",);
     }
 
     pub fn view(solution: Solution) {
@@ -41,18 +41,22 @@ impl Solution {
     fn print(solution: &Solution) {
         println!("{}", solution);
     }
+
+    fn time_to_millis(nanos: u128) -> f64 {
+        nanos as f64 / 1_000_000.0
+    }
+
 }
 
 impl Display for Solution {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
-            "|  {: >2} | {: >10} | {: >15} | {: >15} | {: >15} |",
+            "|  {: >2} | {: >10} | {: >15} | {: >15} |",
             self.day,
             self.part_1,
             self.part_2,
-            self.duration.as_micros(),
-            self.duration.as_nanos(),
+            Solution::time_to_millis(self.duration.as_nanos()),
         )
     }
 }
