@@ -1,14 +1,10 @@
+use crate::{parse_number_string, read_lines, Solution};
 use std::{cmp::Reverse, collections::BinaryHeap};
 
-use crate::{parse_number_string, read_lines, Solution};
-
-const N: usize = 100;
-const LAST: usize = N - 1;
-
-type Grid = [[u8; N]; N];
+type Grid = [[u8; GRID_SIZE]; GRID_SIZE];
 
 fn parse_grid(rows: &Vec<String>) -> Grid {
-    let mut grid = [[0u8; N]; N];
+    let mut grid = [[0u8; GRID_SIZE]; GRID_SIZE];
 
     rows.into_iter()
         .map(parse_number_string)
@@ -22,11 +18,11 @@ fn parse_grid(rows: &Vec<String>) -> Grid {
     grid
 }
 
-fn is_last((x, y): (usize, usize)) -> bool {
-    x == LAST && y == LAST
+fn is_last<const N: usize>((x, y): (usize, usize)) -> bool {
+    x == N - 1 && y == N - 1
 }
 
-fn is_in_grid((x, y): &&(usize, usize)) -> bool {
+fn is_in_grid<const N: usize>((x, y): &&(usize, usize)) -> bool {
     x < &&N && y < &&N
 }
 
@@ -40,19 +36,19 @@ fn adjacent((x, y): (usize, usize)) -> [(usize, usize); 4] {
     ]
 }
 
-fn find_lowest_risk_level(mut map: Grid) -> u32 {
+fn find_lowest_risk_level<const N: usize>(mut map: [[u8; N]; N]) -> u32 {
     // Use Reverse to get the lowest instead of the highest risk.
     let mut heap = BinaryHeap::from(vec![(Reverse(0), (0, 0))]);
 
     while let Some((Reverse(risk), position)) = heap.pop() {
-        if is_last(position) {
+        if is_last::<N>(position) {
             return risk;
         }
 
         adjacent(position)
             .iter()
             // Remove wrapped positions
-            .filter(is_in_grid)
+            .filter(is_in_grid::<N>)
             .for_each(|&(x, y)| {
                 if map[y][x] > 0 {
                     heap.push((Reverse(risk + map[y][x] as u32), (x, y)));
@@ -64,18 +60,43 @@ fn find_lowest_risk_level(mut map: Grid) -> u32 {
     0
 }
 
-/* Solutions */
+fn scale_grid<const N: usize>(grid: &Grid) -> [[u8; N]; N] {
+    let mut scaled_grid = [[0u8; N]; N];
+    let mut offset = 0;
 
-fn part01(input: &Vec<String>) -> u32 {
-    find_lowest_risk_level(parse_grid(input))
+    for y in 0..N {
+        if y != 0 && y % GRID_SIZE == 0 {
+            offset += 1;
+        }
+        for x in 0..N {
+            if x != 0 && x % GRID_SIZE == 0 {
+                offset += 1;
+            }
+            // Add offset, - 1 to be able to use mod 9 and then + 1 to restore to correct value.
+            scaled_grid[y][x] = ((grid[y % GRID_SIZE][x % GRID_SIZE] + offset - 1) % 9) + 1;
+        }
+        offset -= 4;
+    }
+
+    scaled_grid
 }
 
-fn part02(input: &Vec<String>) -> u32 {
-    0
+/* Solutions */
+
+// Default grid size.
+const GRID_SIZE: usize = 100;
+
+fn part01(grid: &Grid) -> u32 {
+    find_lowest_risk_level(*grid)
+}
+
+fn part02(grid: &Grid) -> u32 {
+    const N: usize = GRID_SIZE * 5;
+    find_lowest_risk_level(scale_grid::<N>(grid))
 }
 
 pub fn day_15() -> Solution {
-    let input = read_lines("./input/day_15.txt");
+    let input = parse_grid(&read_lines("./input/day_15.txt"));
     let timer = std::time::Instant::now();
     Solution::new(15, part01(&input), part02(&input), timer.elapsed())
 }
@@ -87,31 +108,15 @@ mod tests {
     // Note this useful idiom: importing names from outer (for mod tests) scope.
     use super::*;
 
-    // #[test]
-    // fn test_parse() {
-    //     vec![
-    //         String::from("1163751742"),
-    //         String::from("1381373672"),
-    //         String::from("2136511328"),
-    //         String::from("3694931569"),
-    //         String::from("7463417111"),
-    //         String::from("1319128137"),
-    //         String::from("1359912421"),
-    //         String::from("3125421639"),
-    //         String::from("1293138521"),
-    //         String::from("2311944581"),
-    //     ]
-    // }
+    #[test]
+    fn test_part01() {
+        let input = parse_grid(&read_lines("./input/day_15.txt"));
+        assert_eq!(part01(&input), 595)
+    }
 
-    // #[test]
-    // fn test_part01() {
-    //     let input = read("./input/day_15.txt");
-    //     assert_eq!(part01(&input), 0)
-    // }
-
-    // #[test]
-    // fn test_part02() {
-    //     let input = read("./input/day_15.txt");
-    //     assert_eq!(part02(&input), 0)
-    // }
+    #[test]
+    fn test_part02() {
+        let input = parse_grid(&read_lines("./input/day_15.txt"));
+        assert_eq!(part02(&input), 2914)
+    }
 }
