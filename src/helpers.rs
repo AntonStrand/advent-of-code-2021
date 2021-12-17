@@ -17,10 +17,6 @@ pub fn map_pair<A, B, F: Fn(A) -> B>(f: F, (fst, snd): (A, A)) -> (B, B) {
     (f(fst), f(snd))
 }
 
-pub fn map_fst<A, B, C, F: Fn(A) -> C>(f: F, (fst, snd): (A, B)) -> (C, B) {
-    (f(fst), snd)
-}
-
 pub fn map_snd<A, B, C, F: Fn(B) -> C>(f: F, (fst, snd): (A, B)) -> (A, C) {
     (fst, f(snd))
 }
