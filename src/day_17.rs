@@ -1,5 +1,3 @@
-use std::{convert::identity, ops::Range};
-
 use crate::{map_pair, read, unsafe_parse, Solution};
 
 const LEFT: usize = 0;
@@ -35,8 +33,7 @@ fn has_missed(target: TargetArea, x: i16, y: i16) -> bool {
     x > target[RIGHT] || y < target[BOTTOM]
 }
 
-fn simulate(target: TargetArea, mut vx: i16, mut vy: i16) -> Option<i16> {
-    let mut max_height = 0;
+fn simulate(target: TargetArea, mut vx: i16, mut vy: i16) -> i16 {
     let mut y = 0;
     let mut x = 0;
 
@@ -44,47 +41,45 @@ fn simulate(target: TargetArea, mut vx: i16, mut vy: i16) -> Option<i16> {
         // Update movement
         y += vy;
         x += vx;
+
+        // Add drag and gravity
         vx -= if vx > 0 { 1 } else { 0 };
         vy -= 1;
 
-        max_height = max_height.max(y);
-
         if is_in(target, x, y) {
-            return Some(max_height);
+            return 1;
         }
 
         if has_missed(target, x, y) {
-            return None;
+            return 0;
         }
     }
-}
-
-fn brute(target: TargetArea, y_range: Range<i16>) -> Vec<i16> {
-    let mut results = vec![];
-
-    for x in 1..target[RIGHT] + 1 {
-        for y in y_range.to_owned() {
-            results.push(simulate(target, x, y));
-        }
-    }
-
-    results.into_iter().filter_map(identity).collect()
 }
 
 /* Solutions */
 
-fn part01(input: &String) -> i16 {
-    let target = to_target_area(&input);
-    brute(target, 1..170).into_iter().max().unwrap_or(0)
+fn part01(target: &TargetArea) -> i16 {
+    let n = target[BOTTOM];
+    // The bottom line is an triangular number and
+    // therefor this formula will calculate the hightest point.
+    // https://en.wikipedia.org/wiki/Triangular_number
+    n * (n + 1) / 2
 }
 
-fn part02(input: &String) -> i16 {
-    let target = to_target_area(&input);
-    brute(target, target[BOTTOM]..170).len() as i16
+fn part02(target: &TargetArea) -> i16 {
+    let mut results = vec![];
+
+    for x in 1..=target[RIGHT] {
+        for y in target[BOTTOM]..170 {
+            results.push(simulate(*target, x, y));
+        }
+    }
+
+    results.into_iter().sum()
 }
 
 pub fn day_17() -> Solution {
-    let input = read("./input/day_17.txt");
+    let input = to_target_area(&read("./input/day_17.txt"));
     let timer = std::time::Instant::now();
     Solution::new(17, part01(&input), part02(&input), timer.elapsed())
 }
@@ -112,25 +107,25 @@ mod tests {
     #[test]
     fn test_simulate_6_3() {
         let target = to_target_area("target area: x=20..30, y=-10..-5");
-        assert_eq!(simulate(target, 6, 3), Some(6))
+        assert_eq!(simulate(target, 6, 3), 1)
     }
 
     #[test]
     fn test_simulate_9_0() {
         let target = to_target_area("target area: x=20..30, y=-10..-5");
-        assert_eq!(simulate(target, 9, 0), Some(0))
+        assert_eq!(simulate(target, 9, 0), 1)
     }
 
     #[test]
     fn test_simulate_7_2() {
         let target = to_target_area("target area: x=20..30, y=-10..-5");
-        assert_eq!(simulate(target, 7, 2), Some(3))
+        assert_eq!(simulate(target, 7, 2), 1)
     }
 
     #[test]
     fn test_simulate_miss() {
         let target = to_target_area("target area: x=20..30, y=-10..-5");
-        assert_eq!(simulate(target, 0, 2), None)
+        assert_eq!(simulate(target, 0, 2), 0)
     }
 
     #[test]
@@ -143,13 +138,13 @@ mod tests {
 
     #[test]
     fn test_part01() {
-        let input = read("./input/day_17.txt");
+        let input = to_target_area(&read("./input/day_17.txt"));
         assert_eq!(part01(&input), 12090)
     }
 
     #[test]
     fn test_part02() {
-        let input = read("./input/day_17.txt");
+        let input = to_target_area(&read("./input/day_17.txt"));
         assert_eq!(part02(&input), 5059)
     }
 }
