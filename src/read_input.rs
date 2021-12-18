@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use crate::{unsafe_parse, Direction};
+use crate::unsafe_parse;
 
 pub fn read(path: &str) -> String {
     std::fs::read_to_string(&path).unwrap()
@@ -16,8 +16,4 @@ pub fn read_number_input<T: FromStr>(path: &str) -> Vec<T> {
 
 pub fn read_comma_separated_number_input<T: FromStr>(path: &str) -> Vec<T> {
     read(path).split(",").map(unsafe_parse).collect()
-}
-
-pub fn read_directions(path: &str) -> Vec<Direction> {
-    read(path).lines().map(Direction::from_str).collect()
 }

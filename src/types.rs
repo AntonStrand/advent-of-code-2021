@@ -12,7 +12,11 @@ pub struct Solution {
 }
 
 impl Solution {
-    pub fn new<T: ToString>(day: u8, part_1: T, part_2: T, duration: Duration) -> Solution {
+    pub fn new<A, B>(day: u8, part_1: A, part_2: B, duration: Duration) -> Solution
+    where
+        A: ToString,
+        B: ToString,
+    {
         Solution {
             day: day.to_string(),
             part_1: part_1.to_string(),
@@ -63,27 +67,5 @@ impl Display for Solution {
             self.part_2,
             Solution::time_to_millis(self.duration.as_nanos()),
         )
-    }
-}
-
-// DIRECTIONS
-
-#[derive(Debug)]
-pub enum Direction {
-    Forward(u32),
-    Down(u32),
-    Up(u32),
-}
-
-impl Direction {
-    pub fn from_str(input: &str) -> Direction {
-        let (direction, value) = input.split_once(" ").unwrap();
-        let n = value.parse::<u32>().unwrap();
-
-        match direction {
-            "forward" => Direction::Forward(n),
-            "down" => Direction::Down(n),
-            _ => Direction::Up(n),
-        }
     }
 }
