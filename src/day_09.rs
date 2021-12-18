@@ -100,11 +100,11 @@ impl Matrix {
 
 /* Solutions */
 
-fn part01(input: &Matrix) -> u64 {
+fn part01(input: &Matrix) -> u16 {
     input
         .get_low_points()
         .iter()
-        .map(|a| (a.value + 1) as u64)
+        .map(|a| (a.value + 1) as u16)
         .sum()
 }
 

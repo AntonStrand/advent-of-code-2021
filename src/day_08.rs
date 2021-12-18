@@ -7,13 +7,13 @@ fn is_simple_digit(digit: &&str) -> bool {
     }
 }
 
-fn count_simple_digits(segment: &String) -> u64 {
+fn count_simple_digits(segment: &String) -> usize {
     let (_, digits) = segment.split_once("|").unwrap();
     digits
         .split(" ")
         .into_iter()
         .filter(is_simple_digit)
-        .count() as u64
+        .count()
 }
 
 fn find_number_by_len(len: usize, signals: &str) -> Vec<&str> {
@@ -83,7 +83,7 @@ fn parse_segment(segment: &String) -> u64 {
 
 /* Solutions */
 
-fn part01(input: &Vec<String>) -> u64 {
+fn part01(input: &Vec<String>) -> usize {
     input.into_iter().map(count_simple_digits).sum()
 }
 

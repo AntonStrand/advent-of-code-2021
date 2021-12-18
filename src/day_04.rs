@@ -93,17 +93,16 @@ fn play(board: &Board, numbers: Vec<u8>) -> Option<(usize, u32, u8)> {
     }
 }
 
-fn part01(input: &(Vec<Board>, Vec<u8>)) -> u64 {
-    let winning_boards = get_winning_boards(input);
-    let (_, score, winning_number) = winning_boards.first().unwrap();
+fn part01(input: &(Vec<Board>, Vec<u8>)) -> u32 {
+    let (_, score, winning_number) = *get_winning_boards(input).first().unwrap();
 
-    *score as u64 * (*winning_number as u64)
+    score * (winning_number as u32)
 }
 
-fn part02(input: &(Vec<Board>, Vec<u8>)) -> u64 {
+fn part02(input: &(Vec<Board>, Vec<u8>)) -> u32 {
     let (_, score, winning_number) = get_winning_boards(input).pop().unwrap();
 
-    score as u64 * (winning_number as u64)
+    score * (winning_number as u32)
 }
 
 pub fn day_04() -> Solution {

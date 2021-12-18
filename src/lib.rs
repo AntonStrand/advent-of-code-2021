@@ -17,7 +17,7 @@ mod day_16;
 mod day_17;
 mod helpers;
 mod read_input;
-mod types;
+mod solution;
 
 pub use day_01::day_01;
 pub use day_02::day_02;
@@ -47,8 +47,6 @@ pub use helpers::to_columns;
 pub use helpers::unsafe_parse;
 pub use read_input::read;
 pub use read_input::read_comma_separated_number_input;
-pub use read_input::read_directions;
 pub use read_input::read_lines;
 pub use read_input::read_number_input;
-pub use types::Direction;
-pub use types::Solution;
+pub use solution::Solution;

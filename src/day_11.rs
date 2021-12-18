@@ -93,8 +93,8 @@ impl Grid {
 #[derive(Debug, PartialEq, Clone, Copy)]
 struct State {
     grid: Grid,
-    flashes: u32,
-    step_flashes: u32,
+    flashes: u16,
+    step_flashes: u16,
 }
 
 impl State {
@@ -108,7 +108,7 @@ impl State {
 
     fn step(&self) -> State {
         let mut grid = self.grid.increment_all();
-        let mut flashes = 0u32;
+        let mut flashes = 0;
         let mut has_flashed: HashSet<Point> = HashSet::new();
         let mut should_flash: Vec<Point> = vec![];
 
@@ -142,15 +142,15 @@ impl State {
 
 /* Solutions */
 
-fn part01(input: &State) -> u64 {
+fn part01(input: &State) -> u16 {
     let final_state = (0..100)
         .into_iter()
         .fold(input.clone(), |state, _| state.step());
 
-    final_state.flashes as u64
+    final_state.flashes
 }
 
-fn part02(input: &State) -> u64 {
+fn part02(input: &State) -> u16 {
     let mut state = *input;
     let mut step = 0;
 

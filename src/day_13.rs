@@ -180,12 +180,8 @@ fn parse(input: String) -> (Paper, Vec<Instruction>) {
 
 /* Solutions */
 
-fn part01((paper, instructions): &(Paper, Vec<Instruction>)) -> String {
-    paper
-        .fold(instructions.first().unwrap())
-        .coordinates
-        .len()
-        .to_string()
+fn part01((paper, instructions): &(Paper, Vec<Instruction>)) -> usize {
+    paper.fold(instructions.first().unwrap()).coordinates.len()
 }
 
 fn part02((paper, instructions): &(Paper, Vec<Instruction>)) -> String {
@@ -319,7 +315,7 @@ mod tests {
     #[test]
     fn test_part01() {
         let input = parse(read("./input/day_13.txt"));
-        assert_eq!(part01(&input), "675")
+        assert_eq!(part01(&input), 675)
     }
 
     #[test]

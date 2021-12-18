@@ -129,7 +129,7 @@ fn part02(input: &Vec<String>) -> u64 {
 pub fn day_10() -> Solution {
     let input = read_lines("./input/day_10.txt");
     let timer = std::time::Instant::now();
-    Solution::new(9, part01(&input), part02(&input), timer.elapsed())
+    Solution::new(10, part01(&input), part02(&input), timer.elapsed())
 }
 
 /* Tests */
