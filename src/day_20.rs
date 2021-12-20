@@ -1,30 +1,36 @@
-use std::{collections::HashMap, fmt::Debug};
+use std::collections::HashMap;
 
-use crate::{map_both, read, Solution};
+use crate::{map_fst, read, Solution};
 
 type Algorithm = [bool; 512];
+
+#[derive(Clone)]
 struct Image {
     pixels: HashMap<(isize, isize), bool>,
     size: isize,
     lit: u32,
     default_pixel: bool,
+    algorithm: Algorithm,
 }
 
 impl Image {
-    fn new(size: isize, default_pixel: bool) -> Image {
+    fn new(size: isize, default_pixel: bool, algorithm: Algorithm) -> Image {
         Image {
             pixels: HashMap::new(),
             size,
             lit: 0,
             default_pixel,
+            algorithm,
         }
     }
 
     fn from_str(input: &str) -> Image {
+        let (algorithm, image_data) = map_fst(parse_algorithm, input.split_once("\n\n").unwrap());
+
         let mut lit = 0;
 
         Image {
-            pixels: input
+            pixels: image_data
                 .lines()
                 .enumerate()
                 .flat_map(|(y, line)| {
@@ -39,9 +45,10 @@ impl Image {
                         .collect::<Vec<((isize, isize), bool)>>()
                 })
                 .collect(),
-            size: input.lines().count() as isize,
+            size: image_data.lines().count() as isize,
             lit,
             default_pixel: false,
+            algorithm,
         }
     }
 
@@ -61,8 +68,6 @@ impl Image {
         .iter()
         .fold(String::new(), |s, b| format!("{}{}", s, *b as u8));
 
-        // println!("{}", binary);
-
         usize::from_str_radix(&binary, 2).unwrap()
     }
 
@@ -71,44 +76,17 @@ impl Image {
         self.lit += pixel as u32
     }
 
-    fn enhance(&self, algorithm: Algorithm) -> Image {
-        let mut output = Image::new(self.size + 2, !self.default_pixel);
+    fn enhance(&self) -> Image {
+        let mut output = Image::new(self.size + 2, !self.default_pixel, self.algorithm);
 
         for y in 0..output.size {
             for x in 0..output.size {
                 let i = self.get_algorithm_index(x - 1, y - 1, self.default_pixel);
-                output.insert(x, y, algorithm[i]);
+                output.insert(x, y, self.algorithm[i]);
             }
         }
 
         output
-    }
-}
-
-impl Debug for Image {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let mut grid: Vec<_> = self.pixels.clone().into_iter().collect();
-
-        grid.sort_by_key(|&((x, y), _)| (y, x));
-
-        let grid = grid
-            .into_iter()
-            .fold((String::new(), 0), |(mut s, row), ((_, y), b)| {
-                s.push_str(if b { "#" } else { " " });
-
-                if row < y {
-                    s.push_str("\n");
-                }
-
-                (s, y)
-            })
-            .0;
-
-        write!(
-            f,
-            "{:?}\nSize: {}x{}\nLit: {}",
-            grid, self.size, self.size, self.lit
-        )
     }
 }
 
@@ -128,34 +106,21 @@ fn parse_algorithm(input: &str) -> Algorithm {
 
 /* Solutions */
 
-fn part01(input: &String) -> u32 {
-    let (algorithm, image) = map_both(
-        parse_algorithm,
-        Image::from_str,
-        input.split_once("\n\n").unwrap(),
-    );
-
-    image.enhance(algorithm).enhance(algorithm).lit
+fn part01(image: &Image) -> u32 {
+    image.enhance().enhance().lit
 }
 
-fn part02(input: &String) -> u32 {
-    let (algorithm, mut image) = map_both(
-        parse_algorithm,
-        Image::from_str,
-        input.split_once("\n\n").unwrap(),
-    );
-
-    for _ in 0..50 {
-        image = image.enhance(algorithm);
-    }
-
-    image.lit
+fn part02(image: Image) -> u32 {
+    (0..50)
+        .into_iter()
+        .fold(image, |image, _| image.enhance())
+        .lit
 }
 
 pub fn day_20() -> Solution {
-    let input = read("./input/day_20.txt");
+    let input = Image::from_str(&read("./input/day_20.txt"));
     let timer = std::time::Instant::now();
-    Solution::new(20, part01(&input), part02(&input), timer.elapsed())
+    Solution::new(20, part01(&input), part02(input), timer.elapsed())
 }
 
 /* Tests */
@@ -179,13 +144,13 @@ mod tests {
 
     #[test]
     fn test_part01() {
-        let input = read("./input/day_20.txt");
+        let input = Image::from_str(&read("./input/day_20.txt"));
         assert_eq!(part01(&input), 5432)
     }
 
     #[test]
     fn test_part02() {
-        let input = read("./input/day_20.txt");
-        assert_eq!(part02(&input), 16016)
+        let input = Image::from_str(&read("./input/day_20.txt"));
+        assert_eq!(part02(input), 16016)
     }
 }

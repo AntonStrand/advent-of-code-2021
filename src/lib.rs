@@ -44,6 +44,7 @@ pub use day_19::day_19;
 pub use day_20::day_20;
 pub use helpers::is_upper;
 pub use helpers::map_both;
+pub use helpers::map_fst;
 pub use helpers::map_pair;
 pub use helpers::map_snd;
 pub use helpers::parse_number_string;
