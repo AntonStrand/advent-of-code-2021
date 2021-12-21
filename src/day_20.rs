@@ -1,22 +1,20 @@
-use std::collections::HashMap;
-
 use crate::{map_fst, read, Solution};
 
 type Algorithm = [bool; 512];
 
 #[derive(Clone)]
 struct Image {
-    pixels: HashMap<(isize, isize), bool>,
-    size: isize,
+    pixels: Vec<Vec<bool>>,
+    size: usize,
     lit: u32,
     default_pixel: bool,
     algorithm: Algorithm,
 }
 
 impl Image {
-    fn new(size: isize, default_pixel: bool, algorithm: Algorithm) -> Image {
+    fn new(size: usize, default_pixel: bool, algorithm: Algorithm) -> Image {
         Image {
-            pixels: HashMap::new(),
+            pixels: vec![vec![default_pixel; size]; size],
             size,
             lit: 0,
             default_pixel,
@@ -27,32 +25,19 @@ impl Image {
     fn from_str(input: &str) -> Image {
         let (algorithm, image_data) = map_fst(parse_algorithm, input.split_once("\n\n").unwrap());
 
-        let mut lit = 0;
-
         Image {
             pixels: image_data
                 .lines()
-                .enumerate()
-                .flat_map(|(y, line)| {
-                    line.chars()
-                        .enumerate()
-                        .map(|(x, c)| {
-                            ((x as isize, y as isize), {
-                                lit += (c == '#') as u32;
-                                is_lit(c)
-                            })
-                        })
-                        .collect::<Vec<((isize, isize), bool)>>()
-                })
+                .map(|line| line.chars().map(|c| is_lit(c)).collect())
                 .collect(),
-            size: image_data.lines().count() as isize,
-            lit,
+            size: image_data.lines().count(),
+            lit: 0, // No need to set this now since it will be reset at when enhancing
             default_pixel: false,
             algorithm,
         }
     }
 
-    fn get_algorithm_index(&self, x: isize, y: isize, default_pixel: bool) -> usize {
+    fn get_algorithm_index(&self, x: usize, y: usize) -> usize {
         let binary: String = [
             (x - 1, y - 1),
             (x, y - 1),
@@ -64,15 +49,21 @@ impl Image {
             (x, y + 1),
             (x + 1, y + 1),
         ]
-        .map(|pos| *self.pixels.get(&pos).unwrap_or(&default_pixel))
+        .map(|(x, y)| {
+            *self
+                .pixels
+                .get(y)
+                .and_then(|row| row.get(x))
+                .unwrap_or(&self.default_pixel)
+        })
         .iter()
         .fold(String::new(), |s, b| format!("{}{}", s, *b as u8));
 
         usize::from_str_radix(&binary, 2).unwrap()
     }
 
-    fn insert(&mut self, x: isize, y: isize, pixel: bool) {
-        self.pixels.insert((x, y), pixel);
+    fn insert(&mut self, x: usize, y: usize, pixel: bool) {
+        self.pixels[y][x] = pixel;
         self.lit += pixel as u32
     }
 
@@ -81,7 +72,7 @@ impl Image {
 
         for y in 0..output.size {
             for x in 0..output.size {
-                let i = self.get_algorithm_index(x - 1, y - 1, self.default_pixel);
+                let i = self.get_algorithm_index(x - 1, y - 1);
                 output.insert(x, y, self.algorithm[i]);
             }
         }
@@ -139,7 +130,7 @@ mod tests {
 ..#..
 ..###"#,
         );
-        assert_eq!(image.get_algorithm_index(2, 2, false), 34)
+        assert_eq!(image.get_algorithm_index(2, 2), 34)
     }
 
     #[test]
